@@ -1,0 +1,15 @@
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\bin\Debug\Processamento de Imagens.exe.config
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\bin\Debug\Processamento de Imagens.exe
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\bin\Debug\Processamento de Imagens.pdb
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\MainWindow.g.cs
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\App.g.cs
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens_MarkupCompile.cache
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens_MarkupCompile.lref
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\MainWindow.baml
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.g.resources
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento_de_Imagens.Properties.Resources.resources
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.csproj.GenerateResource.cache
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.csproj.CoreCompileInputs.cache
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.exe
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.pdb
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.csprojAssemblyReference.cache

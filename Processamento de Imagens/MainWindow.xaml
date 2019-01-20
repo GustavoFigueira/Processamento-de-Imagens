@@ -1,0 +1,66 @@
+﻿<Window x:Class="Processamento_de_Imagens.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Processamento_de_Imagens"
+        mc:Ignorable="d"
+        Title="Processamento de Imagens - Redimensionamento" Height="800" Width="1200">
+    <Grid Margin="0,0,0,17">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.5*" />
+            <ColumnDefinition Width="0.5*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80*" />
+            <RowDefinition Height="Auto" MinHeight="38" />
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="367*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.3*" />
+                <ColumnDefinition Width="0.3*" />
+                <ColumnDefinition Width="0.3*" />
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" x:Name="Logo" HorizontalAlignment="Center" Stretch="Uniform"  VerticalAlignment="Center" Source="Assets/uft-logo.png" Margin="154,24,162,26" Height="54" Width="81"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontWeight="Bold" FontSize="20"><Run Text="Processamento de Imagens"/><LineBreak/><Run Text="Trabalhos"/></TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="0" HorizontalAlignment="Right" Margin="0,0,20,0" VerticalAlignment="Center" FontSize="14" FontStyle="Italic" FontWeight="Light" TextAlignment="Right">Desenvolvido por: Gustavo Figueira Lopes
+                e João Celino<LineBreak/>IDE: Visual Studio 2018<LineBreak/>Linguagem de Programação: C#
+            </TextBlock>
+        </Grid>
+        <StackPanel Grid.Column="0" HorizontalAlignment="Right" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,145,2" Orientation="Horizontal">
+            <!--<Button x:Name="Upload" Content="Selecionar imagem" Margin="20,0,0,0" Click="Upload_Click" Background="#7F43BACD" />-->
+            <ComboBox x:Name="Option" HorizontalAlignment="Stretch" Width="150" Margin="20,0,0,0" VerticalAlignment="Stretch" SelectionChanged="Option_SelectionChanged">
+                <ComboBoxItem Content="Ampliação"/>
+                <ComboBoxItem Content="Redução"/>
+                <ComboBoxItem Content="Equalização Histograma"/>
+                <ComboBoxItem Content="Transformação de Intensidade (Contrast Stretching)"/>
+                <ComboBoxItem Content="Transformação de Intensidade (Negativo)"/>
+                <ComboBoxItem Content="Operação Aritmética (Adição)"/>
+                <ComboBoxItem Content="Operação Aritmética (Subtração)"/>
+                <ComboBoxItem Content="Operação Geométrica (Rotação)"/>
+            </ComboBox>
+            <StackPanel x:Name="Scaling" Visibility="Hidden" Orientation="Horizontal">
+                <Label Content="Valor de redimensionamento:" Margin="20,0,0,0"/>
+                <TextBox x:Name="Amount" InputScope="Number" Width="100" Text="2"/>
+                <RadioButton x:Name="NearestNeighbor" Content="Vizinho mais próximo" IsChecked="True" GroupName="Mode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,0,0,0" BorderBrush="#FF5C1EFF"/>
+                <RadioButton x:Name="Bilinear" Content="Bilinear" GroupName="Mode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,0,0,0"/>
+            </StackPanel>
+            <StackPanel Visibility="Hidden" x:Name="Aritmetic">
+
+            </StackPanel>
+            <StackPanel Visibility="Hidden" x:Name="Geometric">
+                <RadioButton x:Name="Rotation" Content="Rotação" IsChecked="True" GroupName="Mode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,0,0,0" BorderBrush="#FF5C1EFF"/>
+            </StackPanel>
+            <Button x:Name="Generate" Content="Gerar" Margin="20,0,0,0" Click="Generate_Click" Background="#7F2E8DEC" HorizontalAlignment="Right" Width="60"/>
+            <Button x:Name="Clean" Content="Limpar" Margin="20,0,0,0" Background="#7FEC2E2E" HorizontalAlignment="Right" Width="60" Click="Clean_Click"/>
+        </StackPanel>
+        <StackPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="1" Background="#FFE6E6E6" Margin="20,0,40,0">
+            <Image x:Name="ImageViewerBefore" HorizontalAlignment="Center" VerticalAlignment="Center" Height="500"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.Row="3" Background="#FFE6E6E6" Margin="40,0,20,0">
+            <Image Name="ImageViewerAfter" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Height="500"/>
+        </StackPanel>
+    </Grid>
+</Window>
