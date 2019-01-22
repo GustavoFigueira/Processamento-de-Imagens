@@ -70,11 +70,13 @@ namespace Processamento_de_Imagens
             }
             else if (Option.Text == "Equalização Histograma")
             {
+                // Aplica a Equalização Histograma (tende à colocar realçar as cores mais centrais do histograma - ou a 'barriga' - do gráfico)
                 image = Algorithms.HistogramEqualization(image);
             }
-            else if (Option.Text == "Transformação de Intensidade (Contrast Stretching)")
+            else if (Option.Text == "Limiariazação")
             {
-                image = Algorithms.ContrastStretching(image);
+                // Aplica a Limiariazação e inverte as cores, caso selecionado
+                image = Algorithms.Thresholding(image, InvertThreshold.IsChecked.GetValueOrDefault());
             }
             else if (Option.Text == "Transformação de Intensidade (Negativo)")
             {
@@ -120,7 +122,12 @@ namespace Processamento_de_Imagens
             }
             else if (Option.Text == "Operação Geométrica (Rotação)")
             {
+                // Aplica um Rotação de 90° na imagem
                 image = Algorithms.Rotation(image);
+            }
+            else if (Option.Text == "Rotulação")
+            {
+                image = Algorithms.Rotulation(image);
             }
 
             // Exibe a imagem final
@@ -133,6 +140,7 @@ namespace Processamento_de_Imagens
         private void Option_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             Scaling.Visibility = (Option.SelectedItem.ToString().Contains("Ampliação") || Option.SelectedItem.ToString().Contains("Redução")) ? Visibility.Visible : Visibility.Hidden;
+            Thresholding.Visibility = Option.SelectedItem.ToString().Contains("Limiariazação") ? Visibility.Visible : Visibility.Hidden;
         }
     }
 }

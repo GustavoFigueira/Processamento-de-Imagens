@@ -35,11 +35,12 @@
                 <ComboBoxItem Content="Ampliação"/>
                 <ComboBoxItem Content="Redução"/>
                 <ComboBoxItem Content="Equalização Histograma"/>
-                <ComboBoxItem Content="Transformação de Intensidade (Contrast Stretching)"/>
+                <ComboBoxItem Content="Limiariazação"/>
                 <ComboBoxItem Content="Transformação de Intensidade (Negativo)"/>
                 <ComboBoxItem Content="Operação Aritmética (Adição)"/>
                 <ComboBoxItem Content="Operação Aritmética (Subtração)"/>
                 <ComboBoxItem Content="Operação Geométrica (Rotação)"/>
+                <ComboBoxItem Content="Rotulação"/>
             </ComboBox>
             <StackPanel x:Name="Scaling" Visibility="Hidden" Orientation="Horizontal">
                 <Label Content="Valor de redimensionamento:" Margin="20,0,0,0"/>
@@ -47,8 +48,10 @@
                 <RadioButton x:Name="NearestNeighbor" Content="Vizinho mais próximo" IsChecked="True" GroupName="Mode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,0,0,0" BorderBrush="#FF5C1EFF"/>
                 <RadioButton x:Name="Bilinear" Content="Bilinear" GroupName="Mode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,0,0,0"/>
             </StackPanel>
+            <StackPanel Visibility="Hidden" x:Name="Thresholding">
+                <CheckBox x:Name="InvertThreshold" IsChecked="False" Content="Inverter" />
+            </StackPanel>
             <StackPanel Visibility="Hidden" x:Name="Aritmetic">
-
             </StackPanel>
             <StackPanel Visibility="Hidden" x:Name="Geometric">
                 <RadioButton x:Name="Rotation" Content="Rotação" IsChecked="True" GroupName="Mode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,0,0,0" BorderBrush="#FF5C1EFF"/>
