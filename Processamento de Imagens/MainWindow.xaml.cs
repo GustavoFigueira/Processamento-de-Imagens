@@ -163,7 +163,7 @@ namespace Processamento_de_Imagens
         private void Option_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             Scaling.Visibility = (Option.SelectedItem.ToString().Contains("Ampliação") || Option.SelectedItem.ToString().Contains("Redução")) ? Visibility.Visible : Visibility.Hidden;
-            Thresholding.Visibility = Option.SelectedItem.ToString().Contains("Limiariazação") ? Visibility.Visible : Visibility.Hidden;
+            Thresholding.Visibility = Option.SelectedItem.ToString().Contains("Transformação de Intensidade (Limiarização)") ? Visibility.Visible : Visibility.Hidden;
         }
     }
 }
