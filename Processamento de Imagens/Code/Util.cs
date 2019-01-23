@@ -13,24 +13,31 @@ namespace Processamento_de_Imagens.Code
         public enum Option { Reduce, Enlarge };
 
         // Converte a Bitmap para Tons de Cinza
-        public static Bitmap ConvertBitmapToGrayScale(Bitmap bitmap)
+        public static Bitmap ConvertBitmapToGrayScale(Bitmap original)
         {
-            // Faz um loop através dos pixels
-            for (var x = 0; x < bitmap.Width; x++)
-            {
-                var y = 0;
+            var newBitmap = new Bitmap(original.Width, original.Height);
 
-                for (y = 0; y < bitmap.Height; y++)
+            var g = Graphics.FromImage(newBitmap);
+
+            var colorMatrix = new ColorMatrix(
+                new float[][]
                 {
-                    var pixelColor = bitmap.GetPixel(x, y);
-                    var newColor = Color.FromArgb(pixelColor.R, 0, 0);
+                    new float[] {.3f, .3f, .3f, 0, 0},
+                    new float[] {.59f, .59f, .59f, 0, 0},
+                    new float[] {.11f, .11f, .11f, 0, 0},
+                    new float[] {0, 0, 0, 1, 0},
+                    new float[] {0, 0, 0, 0, 1}
+                });
 
-                    // Define em preto e branco
-                    bitmap.SetPixel(x, y, newColor);
-                }
-            }
+            var attributes = new ImageAttributes();
 
-            return bitmap;
+            attributes.SetColorMatrix(colorMatrix);
+
+            g.DrawImage(original, new System.Drawing.Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
+
+            g.Dispose();
+
+            return newBitmap;
         }
 
         // Converte de Imagem para Bitmap

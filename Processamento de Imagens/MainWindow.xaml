@@ -35,7 +35,7 @@
                 <ComboBoxItem Content="Ampliação"/>
                 <ComboBoxItem Content="Redução"/>
                 <ComboBoxItem Content="Equalização Histograma"/>
-                <ComboBoxItem Content="Limiariazação"/>
+                <ComboBoxItem Content="Transformação de Intensidade (Limiarização)"/>
                 <ComboBoxItem Content="Transformação de Intensidade (Negativo)"/>
                 <ComboBoxItem Content="Operação Aritmética (Adição)"/>
                 <ComboBoxItem Content="Operação Aritmética (Subtração)"/>

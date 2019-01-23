@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using static Processamento_de_Imagens.Code.Util;
@@ -209,14 +210,15 @@ namespace Processamento_de_Imagens.Code
 
             var sd = originalImage.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
+            // Bytes auxiliares
             var bytes = sd.Stride * sd.Height;
             var buffer = new byte[bytes];
             var result = new byte[bytes];
 
             Marshal.Copy(sd.Scan0, buffer, 0, bytes);
-
             originalImage.UnlockBits(sd);
 
+            // Novo array RGB dos bytes
             var pn = new double[256];
 
             for (var p = 0; p < bytes; p += 4)
@@ -243,12 +245,14 @@ namespace Processamento_de_Imagens.Code
                 }
             }
 
+            // Monta a imagem final a partir dos bytes
             var rd = newImage.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
+            // Gera a imagem a partir dos bytes manipulados
             Marshal.Copy(result, 0, rd.Scan0, bytes);
-
             newImage.UnlockBits(rd);
 
+            // Retorna a imagem final
             return newImage;
         }
 
@@ -264,7 +268,7 @@ namespace Processamento_de_Imagens.Code
 
             for (var x = 0; x < originalImage.Width; x++)
                 for (var y = 0; y < originalImage.Height; y++)
-                    newImage.SetPixel(x, y, originalImage.GetPixel(x, y).GetBrightness() <= 0.5f? (invert? Color.Black : Color.White) : (invert ? Color.White : Color.Black));
+                    newImage.SetPixel(x, y, originalImage.GetPixel(x, y).GetBrightness() <= 0.5f ? (invert ? Color.Black : Color.White) : (invert ? Color.White : Color.Black));
 
             return newImage;
         }
@@ -272,46 +276,47 @@ namespace Processamento_de_Imagens.Code
         // Transformação de Intensidade (Negativo)
         public static Bitmap Negative(Bitmap originalImage)
         {
-            // Nova imagem
-            var newImage = new Bitmap(originalImage, new Size(originalImage.Height, originalImage.Width));
-
+            //Tamanhos da imagem
             var w = originalImage.Width;
             var h = originalImage.Height;
 
+            // Inicializa o array de bytes a partir da imagem original
             var srcData = originalImage.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
+            // Variáveis auxiliares
             var bytes = srcData.Stride * srcData.Height;
-
-            var buffer = new byte[bytes];    
+            var buffer = new byte[bytes];
             var result = new byte[bytes];
 
             Marshal.Copy(srcData.Scan0, buffer, 0, bytes);
             originalImage.UnlockBits(srcData);
 
-            var current = 0;
-            var cChannels = 3;
+            // Os três canais de cor (RGB)
+            const int channels = 3;
 
             for (var y = 0; y < h; y++)
             {
                 for (var x = 0; x < w; x++)
                 {
-                    current = y * srcData.Stride + x * 4;
+                    var current = y * srcData.Stride + x * 4;
 
-                    for (var c = 0; c < cChannels; c++)
+                    for (var c = 0; c < channels; c++)
                         result[current + c] = (byte)(255 - buffer[current + c]);
 
                     result[current + 3] = 255;
                 }
             }
 
-            var resImg = new Bitmap(w, h);
-            var resData = resImg.LockBits(new Rectangle(0, 0, w, h),ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            // Monta a imagem final a partir dos bytes
+            var newImage = new Bitmap(w, h);
+            var bytesData = newImage.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
-            Marshal.Copy(result, 0, resData.Scan0, bytes);
+            // Gera a imagem a partir dos bytes manipulados
+            Marshal.Copy(result, 0, bytesData.Scan0, bytes);
+            newImage.UnlockBits(bytesData);
 
-            resImg.UnlockBits(resData);
-
-            return resImg;
+            // Retorna a imagem final
+            return newImage;
         }
 
         // Operação Aritmética (Adição)
@@ -346,9 +351,9 @@ namespace Processamento_de_Imagens.Code
             // Nova imagem
             var newImage = new Bitmap(originalImage, new Size(originalImage.Height, originalImage.Width));
 
-            for (var i = 0; i < originalImage.Height; i++)
-                for (var j = 0; j < originalImage.Width; j++)
-                    newImage.SetPixel(i, j, originalImage.GetPixel(j, originalImage.Height - i - 1));
+            for (var x = 0; x < originalImage.Height; x++)
+                for (var y = 0; y < originalImage.Width; y++)
+                    newImage.SetPixel(x, y, originalImage.GetPixel(y, originalImage.Height - x - 1));
 
             return newImage;
         }
@@ -356,58 +361,24 @@ namespace Processamento_de_Imagens.Code
         // Rotulação
         public static Bitmap Rotulation(Bitmap originalImage)
         {
-            // Nova imagem
-            //var newImage = new Bitmap(originalImage.Width, originalImage.Height);
-
-            //for row in data:
-            //for column in row:
-            //if data[row][column] is not Background
-
-            //neighbors = connected elements with the current element's value
-
-            //if neighbors is empty
-            //    linked[NextLabel] = set containing NextLabel
-            //labels[row][column] = NextLabel
-            //NextLabel += 1
-
-            //else
-
-            //Find the smallest label
-
-            //    L = neighbors labels
-            //labels[row][column] = min(L)
-            //for label in L
-            //linked[label] = union(linked[label], L)
-
-            // Segunda varredura
-
-            //for row in data
-            //for column in row
-            //if data[row][column] is not Background
-            //labels[row][column] = find(labels[row][column])
-
-            //return labels
-
-
+            // Instância da Imagem final convertida em tons de cinza
             var newImage = ConvertBitmapToGrayScale(originalImage);
 
-            var rotulo = new List<int>();
-            var matrizRotulo = new int[originalImage.Width, originalImage.Height];
-            var equivalencia = new List<int[]>();
+            // Variáveis auxiliares
+            var equivalent = new List<int[]>();
+            var labelColors = new List<int>();
+            var labelImage = new int[originalImage.Width, originalImage.Height];
 
-            rotulo.Add(0);
-
+            // Binariza a imagem ente branco e preto
             for (var i = 0; i < originalImage.Width; i++)
             {
                 for (var j = 0; j < originalImage.Height; j++)
                 {
-                    newImage.SetPixel(i, j, (newImage.GetPixel(i, j).R <= 127) ? Color.FromArgb(0, 0, 0) : Color.FromArgb(255, 255, 255));
-                    matrizRotulo[i, j] = rotulo.Last();
+                    newImage.SetPixel(i, j, (newImage.GetPixel(i, j).R <= 127) ? Color.Black : Color.White);
+                    //labelImage[i, j] = labelColors.LastOrDefault();
                 }
             }
-
-            rotulo.Add(rotulo.Last() + 1);
-
+            
             // Primeira Varredura
             for (var i = 0; i < newImage.Width; i++)
             {
@@ -415,51 +386,62 @@ namespace Processamento_de_Imagens.Code
                 {
                     if (newImage.GetPixel(i, j).R != 255) continue;
 
-                    var r = (i > 0) ? (newImage.GetPixel(i - 1, j)) : Color.Empty;
-                    var s = (j > 0) ? (newImage.GetPixel(i, j - 1)) : Color.Empty;
+                    var r = (i > 0) ? (newImage.GetPixel(i - 1, j)) : Color.Black;
+                    var s = (j > 0) ? (newImage.GetPixel(i, j - 1)) : Color.Black;
 
-                    var failR = r.R == 0 || r == Color.Empty;
-                    var failS = s.R == 0 || s == Color.Empty;
+                    var rIsValid = r.R == 0 || r == Color.Black;
+                    var sIsValid = s.R == 0 || s == Color.Black;
 
-                    if (failR && failS)
+                    if (!rIsValid || !sIsValid)
                     {
-                        rotulo.Add(rotulo.Last() + 1);
-                        matrizRotulo[i, j] = rotulo.Last();
+                        if ((rIsValid) || (sIsValid))
+                            labelImage[i, j] = (rIsValid) ? labelImage[i, j - 1] : labelImage[i - 1, j];
+                        else if ((labelImage[i - 1, j] == labelImage[i, j - 1]))
+                            labelImage[i, j] = labelImage[i, j - 1];
+                        else if ((labelImage[i - 1, j] != labelImage[i, j - 1]))
+                        {
+                            labelImage[i, j] = Math.Min(labelImage[i, j - 1], labelImage[i - 1, j]);
+                            equivalent.Add(new[] { labelImage[i, j - 1], labelImage[i - 1, j] });
+                        }
                     }
-                    else if ((failR && !failS) || (!failR && failS))
+                    else
                     {
-                        matrizRotulo[i, j] = (failR) ? matrizRotulo[i, j - 1] : matrizRotulo[i - 1, j];
-                    }
-                    else if ((!failR && !failS) && (matrizRotulo[i - 1, j] == matrizRotulo[i, j - 1]))
-                    {
-                        matrizRotulo[i, j] = matrizRotulo[i, j - 1];
-                    }
-                    else if ((!failR && !failS) && (matrizRotulo[i - 1, j] != matrizRotulo[i, j - 1]))
-                    {
-                        matrizRotulo[i, j] = Math.Min(matrizRotulo[i, j - 1], matrizRotulo[i - 1, j]);
-                        equivalencia.Add(new int[] { matrizRotulo[i, j - 1], matrizRotulo[i - 1, j] });
+                        labelColors.Add(labelColors.LastOrDefault() + 1);
+                        labelImage[i, j] = labelColors.LastOrDefault();
                     }
                 }
-
             }
 
-            var salto = 1;
+            // * Cor que será o incremento *
+            // Resultado da divisão entre a Constante das cores totais RGB (255 x 255 x 255 = 16581375) pela quantidade de rótulos de cor encontrados
+            const int totalRgb = 16581375;
+            var colorIncrement = totalRgb / labelColors.Count;
 
-            if (rotulo.Count <= 16581375)
-                salto = (16581375 / rotulo.Count);
-
+            // Novo dicionários com as cores e seu valor RGB em inteiro
             var labels = new Dictionary<int, Color>();
-            int red = 0, green = 0, blue = 0;
 
-            for (var i = 0; i < rotulo.Count; i++)
+            var red = 0;
+            var green = 0;
+            var blue = 0;
+
+            for (var i = 0; i < labelColors.Count; i++)
             {
-                if (salto <= 255)
+                if (colorIncrement > 255)
                 {
-                    blue += salto;
+                    // Assina as novas cores dos canais
+                    blue = (blue + colorIncrement) % 255;
+                    red = red + (green + ((blue + colorIncrement) / 255) > 255 ? (green + (blue + colorIncrement) / 255) / 255 : 0);
+                    green = green + ((blue + colorIncrement) / 255) > 255
+                        ? (green + (blue + colorIncrement) / 255) % 255
+                        : green + (blue + colorIncrement) / 255;
+                }
+                else
+                {
+                    blue += colorIncrement;
 
                     if (blue > 255)
                     {
-                        blue = 255 - salto;
+                        blue = 255 - colorIncrement;
                         green++;
 
                         if (green > 255)
@@ -469,46 +451,39 @@ namespace Processamento_de_Imagens.Code
                         }
                     }
                 }
-                else
-                {
-                    blue = (blue + salto) % 255;
-                    red = red + ((green + ((blue + salto) / 255) > 255) ? (green + ((blue + salto) / 255)) / 255 : 0);
-                    green = ((green + ((blue + salto) / 255) > 255) ? (green + ((blue + salto) / 255)) % 255 : green + ((blue + salto) / 255));
-                }
 
+                // Cria uma nova label a partir dos 3 canais de cor
                 labels.Add(i, Color.FromArgb(red, green, blue));
             }
 
-            // Classes de equivalência
-            var classes = new List<List<int>>();
+            // Labels Equivalentes
+            var equal = new List<List<int>>();
 
-            foreach (var item in equivalencia)
+            foreach (var item in equivalent)
             {
-                if (classes.FirstOrDefault(x => x.Contains(item[0]) || x.Contains(item[1])) != null)
-                {
-                    classes.FirstOrDefault(x => x.Contains(item[0]) || x.Contains(item[1]))?.AddRange(item);
-                    classes.FirstOrDefault(x => x.Contains(item[0]) || x.Contains(item[1]))?.Distinct();
-                }
+                if (equal.FirstOrDefault(x => x.Contains(item[0]) || x.Contains(item[1])) == null)
+                    equal.Add(item.ToList());
                 else
-                    classes.Add(item.ToList());
+                    equal.FirstOrDefault(x => x.Contains(item[0]) || x.Contains(item[1]))?.AddRange(item);
             }
 
-            // Segunda Varredura
+            // Segunda Varredura (define os novos pixels na nova imagem)
             for (var i = 0; i < newImage.Width; i++)
             {
                 for (var j = 0; j < newImage.Height; j++)
                 {
                     if (newImage.GetPixel(i, j).R != 255) continue;
 
-                    var classeEquivalente = classes.FirstOrDefault(x => x.Contains(matrizRotulo[i, j]));
+                    var classeEquivalente = equal.Distinct().FirstOrDefault(x => x.Contains(labelImage[i, j]));
 
                     if (classeEquivalente != null)
-                        matrizRotulo[i, j] = classeEquivalente.Min();
+                        labelImage[i, j] = classeEquivalente.Min();
 
-                    newImage.SetPixel(i, j, labels[matrizRotulo[i, j]]);
+                    newImage.SetPixel(i, j, labels[labelImage[i, j]]);
                 }
             }
 
+            // Retorna a imagem final
             return newImage;
         }
     }

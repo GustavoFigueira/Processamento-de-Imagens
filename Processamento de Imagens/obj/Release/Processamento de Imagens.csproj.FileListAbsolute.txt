@@ -1,0 +1,14 @@
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\bin\Release\Processamento de Imagens.exe.config
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\bin\Release\Processamento de Imagens.exe
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\bin\Release\Processamento de Imagens.pdb
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\MainWindow.g.cs
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\App.g.cs
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\Processamento de Imagens_MarkupCompile.cache
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\Processamento de Imagens_MarkupCompile.lref
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\MainWindow.baml
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\Processamento de Imagens.g.resources
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\Processamento_de_Imagens.Properties.Resources.resources
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\Processamento de Imagens.csproj.GenerateResource.cache
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\Processamento de Imagens.csproj.CoreCompileInputs.cache
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\Processamento de Imagens.exe
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Release\Processamento de Imagens.pdb

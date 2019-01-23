@@ -8,9 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("assets/black.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("assets/example.jpg")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("assets/uft-logo.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("assets/white.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("code/labeling.txt")]
 
 

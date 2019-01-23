@@ -1,7 +1,11 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Forms;
 using System.Drawing;
+using System.IO;
+using System.Windows.Input;
 using Processamento_de_Imagens.Code;
+using Cursors = System.Windows.Forms.Cursors;
 
 namespace Processamento_de_Imagens
 {
@@ -35,7 +39,8 @@ namespace Processamento_de_Imagens
                 Title = "Selecione uma imagem",
                 Filter = "Formatos suportados|*.jpg;*.jpeg;*.png|" +
                          "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
-                         "Portable Network Graphic (*.png)|*.png"
+                         "Portable Network Graphic (*.png)|*.png",
+                InitialDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent?.FullName + "\\Examples"
             };
 
             // Retorna se nada for selecionado
@@ -53,85 +58,103 @@ namespace Processamento_de_Imagens
             // Obtêm o algoritmo selecionado 
             var nn = NearestNeighbor.IsChecked != null && NearestNeighbor.IsChecked.Value;
 
-            // Obtêm o modo selecionado
-            if (Option.Text == "Ampliação")
+            // Inicializa o loading
+            Generate.Content = "Aguarde...";
+            System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
+
+            try
             {
-                // Aplica o redimensionamento dependendo do algoritmo selecionado
-                image = nn
-                    ? Algorithms.NearestNeighbor(image, amountValue, Util.Option.Enlarge)
-                    : Algorithms.Bilinear(image, amountValue, Util.Option.Enlarge);
-            }
-            else if (Option.Text == "Redução")
-            {
-                // Aplica o redimensionamento dependendo do algoritmo selecionado
-                image = nn
-                    ? Algorithms.NearestNeighbor(image, amountValue, Util.Option.Reduce)
-                    : Algorithms.Bilinear(image, amountValue, Util.Option.Reduce);
-            }
-            else if (Option.Text == "Equalização Histograma")
-            {
-                // Aplica a Equalização Histograma (tende à colocar realçar as cores mais centrais do histograma - ou a 'barriga' - do gráfico)
-                image = Algorithms.HistogramEqualization(image);
-            }
-            else if (Option.Text == "Limiariazação")
-            {
-                // Aplica a Limiariazação e inverte as cores, caso selecionado
-                image = Algorithms.Thresholding(image, InvertThreshold.IsChecked.GetValueOrDefault());
-            }
-            else if (Option.Text == "Transformação de Intensidade (Negativo)")
-            {
-                image = Algorithms.Negative(image);
-            }
-            else if (Option.Text == "Operação Aritmética (Adição)")
-            {
-                // Inicializa o selecionador de arquivos da segunda imagem
-                var secondFileDialog = new OpenFileDialog
+                // Obtêm o modo selecionado
+                if (Option.Text == "Ampliação")
                 {
-                    Title = "Selecione a segunda imagem de sobreposição",
-                    Filter = "Formatos suportados|*.jpg;*.jpeg;*.png|" +
-                             "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
-                             "Portable Network Graphic (*.png)|*.png"
-                };
-
-                // Retorna se nada for selecionado
-                if (secondFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
-
-                // Caso selecionado, instnacia imagem a partir do arquivo
-                var blendingImage = new Bitmap(secondFileDialog.FileName);
-
-                image = Algorithms.AdditionBlendMode(image, blendingImage);
-            }
-            else if (Option.Text == "Operação Aritmética (Subtração)")
-            {
-                // Inicializa o selecionador de arquivos da segunda imagem
-                var secondFileDialog = new OpenFileDialog
+                    // Aplica o redimensionamento dependendo do algoritmo selecionado
+                    image = nn
+                        ? Algorithms.NearestNeighbor(image, amountValue, Util.Option.Enlarge)
+                        : Algorithms.Bilinear(image, amountValue, Util.Option.Enlarge);
+                }
+                else if (Option.Text == "Redução")
                 {
-                    Title = "Selecione a segunda imagem de sobreposição",
-                    Filter = "Formatos suportados|*.jpg;*.jpeg;*.png|" +
-                             "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
-                             "Portable Network Graphic (*.png)|*.png"
-                };
+                    // Aplica o redimensionamento dependendo do algoritmo selecionado
+                    image = nn
+                        ? Algorithms.NearestNeighbor(image, amountValue, Util.Option.Reduce)
+                        : Algorithms.Bilinear(image, amountValue, Util.Option.Reduce);
+                }
+                else if (Option.Text == "Equalização Histograma")
+                {
+                    // Aplica a Equalização Histograma (tende à colocar realçar as cores mais centrais do histograma - ou a 'barriga' - do gráfico)
+                    image = Algorithms.HistogramEqualization(image);
+                }
+                else if (Option.Text == "Transformação de Intensidade (Limiarização)")
+                {
+                    // Aplica a Limiariazação e inverte as cores, caso selecionado
+                    image = Algorithms.Thresholding(image, InvertThreshold.IsChecked.GetValueOrDefault());
+                }
+                else if (Option.Text == "Transformação de Intensidade (Negativo)")
+                {
+                    image = Algorithms.Negative(image);
+                }
+                else if (Option.Text == "Operação Aritmética (Adição)")
+                {
+                    // Inicializa o selecionador de arquivos da segunda imagem
+                    var secondFileDialog = new OpenFileDialog
+                    {
+                        Title = "Selecione a segunda imagem de sobreposição",
+                        Filter = "Formatos suportados|*.jpg;*.jpeg;*.png|" +
+                                 "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
+                                 "Portable Network Graphic (*.png)|*.png",
+                        InitialDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent?.FullName + "\\Examples"
+                    };
 
-                // Retorna se nada for selecionado
-                if (secondFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
-                // Caso selecionado, instnacia imagem a partir do arquivo
-                var blendingImage = new Bitmap(secondFileDialog.FileName);
+                    // Retorna se nada for selecionado
+                    if (secondFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
-                image = Algorithms.SubtractBlendMode(image, blendingImage);
+                    // Caso selecionado, instnacia imagem a partir do arquivo
+                    var blendingImage = new Bitmap(secondFileDialog.FileName);
+
+                    image = Algorithms.AdditionBlendMode(image, blendingImage);
+                }
+                else if (Option.Text == "Operação Aritmética (Subtração)")
+                {
+                    // Inicializa o selecionador de arquivos da segunda imagem
+                    var secondFileDialog = new OpenFileDialog
+                    {
+                        Title = "Selecione a segunda imagem de sobreposição",
+                        Filter = "Formatos suportados|*.jpg;*.jpeg;*.png|" +
+                                 "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
+                                 "Portable Network Graphic (*.png)|*.png",
+                        InitialDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent?.FullName + "\\Examples"
+                    };
+
+                    // Retorna se nada for selecionado
+                    if (secondFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+                    // Caso selecionado, instnacia imagem a partir do arquivo
+                    var blendingImage = new Bitmap(secondFileDialog.FileName);
+
+                    image = Algorithms.SubtractBlendMode(image, blendingImage);
+                }
+                else if (Option.Text == "Operação Geométrica (Rotação)")
+                {
+                    // Aplica um Rotação de 90° na imagem
+                    image = Algorithms.Rotation(image);
+                }
+                else if (Option.Text == "Rotulação")
+                {
+                    image = Algorithms.Rotulation(image);
+                }
             }
-            else if (Option.Text == "Operação Geométrica (Rotação)")
+            catch (Exception ex)
             {
-                // Aplica um Rotação de 90° na imagem
-                image = Algorithms.Rotation(image);
-            }
-            else if (Option.Text == "Rotulação")
-            {
-                image = Algorithms.Rotulation(image);
+                System.Windows.MessageBox.Show(ex.Message);
             }
 
             // Exibe a imagem final
             ImageViewerAfter.Source = Util.ConvertBitmapToImage(image);
+
+            // Desabilita o loading
+            Generate.Content = "Gerar";
+            System.Windows.Forms.Cursor.Current = Cursors.Default;
 
             // Salva a imagem final no computador
             Util.SaveImage(image, Option.Text);

@@ -98,12 +98,28 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Resource Include="Assets\black.png" />
-    <Resource Include="Assets\example.jpg" />
+    <Resource Include="Examples\black_gradient.png" />
+    <Resource Include="Examples\example-b&amp;w.jpg" />
+    <Resource Include="Examples\white_gradient.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Examples\black.png" />
+    <Resource Include="Examples\example.jpg" />
     <Resource Include="Assets\uft-logo.png" />
-    <Resource Include="Assets\white.png" />
+    <Resource Include="Examples\white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Examples\example-labeling.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Examples\cromossomos.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\screenshot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Code\labeling.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

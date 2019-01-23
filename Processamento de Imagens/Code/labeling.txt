@@ -1,0 +1,124 @@
+// Rotulação
+        public static Bitmap Rotulation(Bitmap originalImage, bool zeroAsBg = true)
+        {
+            var result = new Bitmap(originalImage.Width, originalImage.Height);
+
+            const int maxLabels = 8000000;
+
+            int w = originalImage.Width, h = originalImage.Height;
+
+            var rst = new int[w * h];
+            var parent = new int[maxLabels];
+            var labels = new int[maxLabels];
+
+            // region label starts from 1;
+            // this is required as union-find data structure
+            var nextRegion = 1;
+
+            // Converte a Imagem (BitMap) para um matryz de bytes
+            byte[] image;
+            using (var memoryStream = new MemoryStream())
+            {
+                originalImage.Save(memoryStream, ImageFormat.Bmp);
+
+                image = memoryStream.ToArray();
+            }
+
+            for (var y = 0; y < h; ++y)
+            {
+                for (var x = 0; x < w; ++x)
+                {
+                    if (image[y * w + x] == 0 && zeroAsBg)
+                        continue;
+
+                    var k = 0;
+                    var connected = false;
+
+                    // if connected to the left
+                    if (x > 0 && image[y * w + x - 1] == image[y * w + x])
+                    {
+                        k = rst[y * w + x - 1];
+                        connected = true;
+                    }
+
+                    // if connected to the up
+                    if (y > 0 && image[(y - 1) * w + x] == image[y * w + x] && (connected = false || image[(y - 1) * w + x] < k))
+                    {
+                        k = rst[(y - 1) * w + x];
+                        connected = true;
+                    }
+
+                    if (!connected)
+                    {
+                        k = nextRegion;
+                        nextRegion++;
+                    }
+
+                    if (k >= maxLabels)
+                    {
+                        //Console.Error.WriteLine("maximum number of labels reached. " + "increase MAX_LABELS and recompile.");
+                        //Environment.Exit(1);
+                    }
+
+                    rst[y * w + x] = k;
+
+                    // if connected, but with different label, then do union
+                    if (x > 0 && image[y * w + x - 1] == image[y * w + x] && rst[y * w + x - 1] != k)
+                        LabelingUnion(k, rst[y * w + x - 1], parent);
+
+                    if (y > 0 && image[(y - 1) * w + x] == image[y * w + x] && rst[(y - 1) * w + x] != k)
+                        LabelingUnion(k, rst[(y - 1) * w + x], parent);
+                }
+            }
+
+            // Begin the second pass.  Assign the new labels
+            // if 0 is reserved for background, then the first available label is 1
+            nextLabel = 1;
+
+            for (var i = 0; i < w * h; i++)
+            {
+                if (image[i] == 0 && zeroAsBg) continue;
+
+                rst[i] = LabelingFind(rst[i], parent, labels);
+                // The labels are from 1, if label 0 should be considered, then
+                // all the label should minus 1
+                if (!zeroAsBg)
+                    rst[i]--;
+            }
+
+            nextLabel--; // nextLabel records the max label
+
+            if (!zeroAsBg)
+                nextLabel--;
+
+            Console.WriteLine(nextLabel + " regions");
+
+            return result;
+        }
+
+        private static void LabelingUnion(int x, int y, int[] parent)
+        {
+            while (parent[x] > 0)
+                x = parent[x];
+
+            while (parent[y] > 0)
+                y = parent[y];
+
+            if (x == y) return;
+
+            if (x < y)
+                parent[x] = y;
+            else
+                parent[y] = x;
+        }
+
+        private  static int LabelingFind(int x, int[] parent, int[] label)
+        {
+            while (parent[x] > 0)
+                x = parent[x];
+
+            if (label[x] == 0)
+                label[x] = nextLabel++;
+
+            return label[x];
+        }
