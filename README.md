@@ -1,8 +1,8 @@
 # Processamento-de-Imagens
-Repositório de Implementações da Disciplina de Processamento de Imagens com a Professora Glenda Botelho - UFT.
+Repositório de Implementações da Disciplina de Processamento de Imagens com a **Professora Glenda Botelho - UFT**.
 
 ## Como usar
-- Abrir o excutável em "Pasta_do_Projeto_no_Computador/bin/Debug/Processamento de Imagens"
+- Abrir o excutável em "**Pasta_do_Projeto_no_Computador**/bin/Debug/Processamento de Imagens"
 ou
 - Clonar o projeto e executar a solução no Visual Studio
 
