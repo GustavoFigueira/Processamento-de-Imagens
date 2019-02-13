@@ -143,6 +143,18 @@ namespace Processamento_de_Imagens
                 {
                     image = Algorithms.Rotulation(image);
                 }
+                else if (Option.Text == "Filtro de Média")
+                {
+                    image = Algorithms.MedianFilter(image, 3);
+                }
+                else if (Option.Text == "Filtro Laplaciano")
+                {
+                    image = Algorithms.Laplacian3X3OfGaussian3X3Filter(image);
+                }
+                else if (Option.Text == "Filtro Gradiente")
+                {
+                    image = Algorithms.GradientFilter(image);
+                }
             }
             catch (Exception ex)
             {

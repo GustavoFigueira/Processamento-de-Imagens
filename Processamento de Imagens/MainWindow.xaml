@@ -41,6 +41,9 @@
                 <ComboBoxItem Content="Operação Aritmética (Subtração)"/>
                 <ComboBoxItem Content="Operação Geométrica (Rotação)"/>
                 <ComboBoxItem Content="Rotulação"/>
+                <ComboBoxItem Content="Filtro de Média"/>
+                <ComboBoxItem Content="Filtro Laplaciano"/>
+                <ComboBoxItem Content="Filtro Gradiente"/>
             </ComboBox>
             <StackPanel x:Name="Scaling" Visibility="Hidden" Orientation="Horizontal">
                 <Label Content="Valor de redimensionamento:" Margin="20,0,0,0"/>

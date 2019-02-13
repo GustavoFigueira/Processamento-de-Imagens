@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -486,5 +487,362 @@ namespace Processamento_de_Imagens.Code
             // Retorna a imagem final
             return newImage;
         }
+
+        #region Filtros
+
+        // Filtro de Média
+        public static Bitmap MedianFilter(this Bitmap sourceBitmap, int matrixSize, int bias = 0, bool grayscale = false)
+        {
+            var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+            var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+            var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+
+            sourceBitmap.UnlockBits(sourceData);
+
+            if (grayscale)
+            {
+                for (var k = 0; k < pixelBuffer.Length; k += 4)
+                {
+                    var rgb = pixelBuffer[k] * 0.11f;
+                    rgb += pixelBuffer[k + 1] * 0.59f;
+                    rgb += pixelBuffer[k + 2] * 0.3f;
+
+
+                    pixelBuffer[k] = (byte)rgb;
+                    pixelBuffer[k + 1] = pixelBuffer[k];
+                    pixelBuffer[k + 2] = pixelBuffer[k];
+                    pixelBuffer[k + 3] = 255;
+                }
+            }
+
+            var filterOffset = (matrixSize - 1) / 2;
+
+            var neighbourPixels = new List<int>();
+
+            for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++)
+            {
+                for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++)
+                {
+                    var byteOffset = offsetY * sourceData.Stride + offsetX * 4;
+
+                    neighbourPixels.Clear();
+
+                    for (var filterY = -filterOffset; filterY <= filterOffset; filterY++)
+                    {
+                        for (var filterX = -filterOffset; filterX <= filterOffset; filterX++)
+                        {
+                            var calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
+
+                            neighbourPixels.Add(BitConverter.ToInt32(pixelBuffer, calcOffset));
+                        }
+                    }
+
+                    neighbourPixels.Sort();
+
+                    var middlePixel = BitConverter.GetBytes(neighbourPixels[filterOffset]);
+
+                    resultBuffer[byteOffset] = middlePixel[0];
+                    resultBuffer[byteOffset + 1] = middlePixel[1];
+                    resultBuffer[byteOffset + 2] = middlePixel[2];
+                    resultBuffer[byteOffset + 3] = middlePixel[3];
+                }
+            }
+
+            var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+
+            var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
+
+            resultBitmap.UnlockBits(resultData);
+
+            // Retorna a imagem final
+            return resultBitmap;
+        }
+
+        // Filtro Gradiente (Máscara de Sobel 3X3)
+        public static Bitmap GradientFilter(Bitmap originalImage)
+        {
+            // Aplica o filtro usando a função de convolulação passando a matriz de sobel
+            var resultImage = ConvolutionFilter(originalImage, Matrix.Sobel3X3Horizontal, Matrix.Sobel3X3Vertical, 1.0, 0, false);
+
+            // Retorna a imagem final
+            return resultImage;
+        }
+
+        // Filtro de Convolução
+        private static Bitmap ConvolutionFilter(Bitmap sourceBitmap, double[,] filterMatrix, double factor = 1, int bias = 0, bool grayscale = false)
+        {
+            var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+            var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+            var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+            sourceBitmap.UnlockBits(sourceData);
+
+            if (grayscale)
+            {
+                for (var k = 0; k < pixelBuffer.Length; k += 4)
+                {
+                    var rgb = pixelBuffer[k] * 0.11f;
+                    rgb += pixelBuffer[k + 1] * 0.59f;
+                    rgb += pixelBuffer[k + 2] * 0.3f;
+
+
+                    pixelBuffer[k] = (byte)rgb;
+                    pixelBuffer[k + 1] = pixelBuffer[k];
+                    pixelBuffer[k + 2] = pixelBuffer[k];
+                    pixelBuffer[k + 3] = 255;
+                }
+            }
+
+            var filterWidth = filterMatrix.GetLength(1);
+            var filterHeight = filterMatrix.GetLength(0);
+
+            var filterOffset = (filterWidth - 1) / 2;
+
+            for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++)
+            {
+                for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++)
+                {
+                    double blue = 0;
+                    double green = 0;
+                    double red = 0;
+
+                    var byteOffset = offsetY * sourceData.Stride + offsetX * 4;
+
+                    for (var filterY = -filterOffset; filterY <= filterOffset; filterY++)
+                    {
+                        for (var filterX = -filterOffset; filterX <= filterOffset; filterX++)
+                        {
+
+                            var calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
+
+                            blue += (double)(pixelBuffer[calcOffset]) * filterMatrix[filterY + filterOffset, filterX + filterOffset];
+
+                            green += (double)(pixelBuffer[calcOffset + 1]) * filterMatrix[filterY + filterOffset, filterX + filterOffset];
+
+                            red += (double)(pixelBuffer[calcOffset + 2]) * filterMatrix[filterY + filterOffset, filterX + filterOffset];
+                        }
+                    }
+
+                    blue = factor * blue + bias;
+                    green = factor * green + bias;
+                    red = factor * red + bias;
+
+                    if (blue > 255)
+                    { blue = 255; }
+                    else if (blue < 0)
+                    { blue = 0; }
+
+                    if (green > 255)
+                    { green = 255; }
+                    else if (green < 0)
+                    { green = 0; }
+
+                    if (red > 255)
+                    { red = 255; }
+                    else if (red < 0)
+                    { red = 0; }
+
+                    resultBuffer[byteOffset] = (byte)(blue);
+                    resultBuffer[byteOffset + 1] = (byte)(green);
+                    resultBuffer[byteOffset + 2] = (byte)(red);
+                    resultBuffer[byteOffset + 3] = 255;
+                }
+            }
+
+            var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+
+            var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
+            resultBitmap.UnlockBits(resultData);
+
+            return resultBitmap;
+        }
+
+        // Filtro de Convolução
+        public static Bitmap ConvolutionFilter(this Bitmap sourceBitmap, double[,] xFilterMatrix, double[,] yFilterMatrix, double factor = 1, int bias = 0, bool grayscale = false)
+        {
+            var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+            var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+            var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+            sourceBitmap.UnlockBits(sourceData);
+
+            if (grayscale)
+            {
+                for (var k = 0; k < pixelBuffer.Length; k += 4)
+                {
+                    var rgb = pixelBuffer[k] * 0.11f;
+                    rgb += pixelBuffer[k + 1] * 0.59f;
+                    rgb += pixelBuffer[k + 2] * 0.3f;
+
+                    pixelBuffer[k] = (byte)rgb;
+                    pixelBuffer[k + 1] = pixelBuffer[k];
+                    pixelBuffer[k + 2] = pixelBuffer[k];
+                    pixelBuffer[k + 3] = 255;
+                }
+            }
+
+            var filterOffset = 1;
+
+            for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++)
+            {
+                for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++)
+                {
+                    var greenX = 0.0;
+                    var redX = 0.0;
+                    var blueX = greenX = redX = 0;
+                    var greenY = 0.0;
+                    var redY = 0.0;
+                    var blueY = greenY = redY = 0;
+
+                    var greenTotal = 0.0;
+                    var redTotal = 0.0;
+                    var blueTotal = greenTotal = redTotal = 0.0;
+
+                    var byteOffset = offsetY * sourceData.Stride + offsetX * 4;
+
+                    for (var filterY = -filterOffset; filterY <= filterOffset; filterY++)
+                    {
+                        for (var filterX = -filterOffset; filterX <= filterOffset; filterX++)
+                        {
+                            var calcOffset = byteOffset +
+                                             (filterX * 4) +
+                                             (filterY * sourceData.Stride);
+
+                            blueX += (double)(pixelBuffer[calcOffset]) *
+                                      xFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            greenX += (double)(pixelBuffer[calcOffset + 1]) *
+                                      xFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            redX += (double)(pixelBuffer[calcOffset + 2]) *
+                                      xFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            blueY += (double)(pixelBuffer[calcOffset]) *
+                                      yFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            greenY += (double)(pixelBuffer[calcOffset + 1]) *
+                                      yFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            redY += (double)(pixelBuffer[calcOffset + 2]) *
+                                      yFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+                        }
+                    }
+
+                    blueTotal = Math.Sqrt((blueX * blueX) + (blueY * blueY));
+                    greenTotal = Math.Sqrt((greenX * greenX) + (greenY * greenY));
+                    redTotal = Math.Sqrt((redX * redX) + (redY * redY));
+
+                    if (blueTotal > 255)
+                    { blueTotal = 255; }
+                    else if (blueTotal < 0)
+                    { blueTotal = 0; }
+
+                    if (greenTotal > 255)
+                    { greenTotal = 255; }
+                    else if (greenTotal < 0)
+                    { greenTotal = 0; }
+
+                    if (redTotal > 255)
+                    { redTotal = 255; }
+                    else if (redTotal < 0)
+                    { redTotal = 0; }
+
+                    resultBuffer[byteOffset] = (byte)(blueTotal);
+                    resultBuffer[byteOffset + 1] = (byte)(greenTotal);
+                    resultBuffer[byteOffset + 2] = (byte)(redTotal);
+                    resultBuffer[byteOffset + 3] = 255;
+                }
+            }
+
+            var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+
+            var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly,PixelFormat.Format32bppArgb);
+
+            Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
+            resultBitmap.UnlockBits(resultData);
+
+            return resultBitmap;
+        }
+
+        // Filtro Laplaciano 3X3
+        public static Bitmap Laplacian3X3Filter(this Bitmap sourceBitmap)
+        {
+            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Laplacian3X3, 1.0, 0, true);
+
+            return resultBitmap;
+        }
+
+        // Filtro Laplaciano 5X5
+        public static Bitmap Laplacian5X5Filter(this Bitmap sourceBitmap)
+        {
+            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Laplacian5X5, 1.0, 0, true);
+
+            return resultBitmap;
+        }
+
+        // Filtro Laplaciano Gaussiano
+        public static Bitmap LaplacianOfGaussianFilter(this Bitmap sourceBitmap)
+        {
+            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.LaplacianOfGaussian, 1.0, 0, true);
+
+            return resultBitmap;
+        }
+
+        public static Bitmap Laplacian3X3OfGaussian3X3Filter(this Bitmap sourceBitmap)
+        {
+            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Gaussian3X3, 1.0 / 16.0, 0, true);
+
+            resultBitmap = ConvolutionFilter(resultBitmap, Matrix.Laplacian3X3, 1.0, 0, false);
+
+            return resultBitmap;
+        }
+
+        public static Bitmap Laplacian3X3OfGaussian5X5Filter1(this Bitmap sourceBitmap)
+        {
+            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Gaussian5X5, 1.0 / 159.0, 0, true);
+
+            resultBitmap = ConvolutionFilter(resultBitmap, Matrix.Laplacian3X3, 1.0, 0, false);
+
+            return resultBitmap;
+        }
+
+        public static Bitmap Laplacian5X5OfGaussian3X3Filter(this Bitmap sourceBitmap)
+        {
+            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Gaussian3X3, 1.0 / 16.0, 0, true);
+
+            resultBitmap = ConvolutionFilter(resultBitmap, Matrix.Laplacian5X5, 1.0, 0, false);
+
+            return resultBitmap;
+        }
+
+        public static Bitmap Laplacian5X5OfGaussian5X5Filter1(this Bitmap sourceBitmap)
+        {
+            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Gaussian5X5, 1.0 / 159.0, 0, true);
+
+            resultBitmap = ConvolutionFilter(resultBitmap, Matrix.Laplacian5X5, 1.0, 0, false);
+
+            return resultBitmap;
+        }
+
+        #endregion
+
     }
 }

@@ -66,6 +66,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Code\Algorithms.cs" />
+    <Compile Include="Code\Matrix.cs" />
     <Compile Include="Code\Util.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -117,9 +118,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\screenshot.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Code\labeling.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

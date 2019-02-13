@@ -12,3 +12,4 @@ D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\
 D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.csproj.CoreCompileInputs.cache
 D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.exe
 D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.pdb
+D:\Projetos\Windows Forms\Processamento de Imagens\Processamento de Imagens\obj\Debug\Processamento de Imagens.csprojAssemblyReference.cache
