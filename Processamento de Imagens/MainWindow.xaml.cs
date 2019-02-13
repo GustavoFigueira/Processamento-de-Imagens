@@ -145,15 +145,39 @@ namespace Processamento_de_Imagens
                 }
                 else if (Option.Text == "Filtro de Média")
                 {
-                    image = Algorithms.MedianFilter(image, 3);
+                    // Tamanho da Matriz de Máscara
+                    var medianFilterMatrix = 3;
+
+                    int.TryParse(MedianFilterMatrix.Text, out medianFilterMatrix);
+
+                    // Filtro de Média com matriz 3X3
+                    image = Algorithms.MedianFilter(image, medianFilterMatrix);
                 }
                 else if (Option.Text == "Filtro Laplaciano")
                 {
-                    image = Algorithms.Laplacian3X3OfGaussian3X3Filter(image);
+                    // Obtêm a opção de Filtro Laplaciano selecionada
+                    var laplacianOption = LaplacianOption.Text;
+
+                    if (laplacianOption == "3X3")
+                    {
+                        image = Algorithms.Laplacian3X3Filter(image);
+                    }
+                    else if (laplacianOption == "5X5")
+                    {
+                        image = Algorithms.Laplacian5X5Filter(image);
+                    }
+                    else if (laplacianOption == "Gaussiano")
+                    {
+                        image = Algorithms.LaplacianOfGaussianFilter(image);
+                    }
+                    else if (laplacianOption == "3X3 e 5X5")
+                    {
+                        image = Algorithms.Laplacian3X3OfGaussian3X3Filter(image);
+                    }
                 }
-                else if (Option.Text == "Filtro Gradiente")
+                else if (Option.Text == "Filtro Gradiente (Sobel)")
                 {
-                    image = Algorithms.GradientFilter(image);
+                    image = Algorithms.GradientSobelFilter(image);
                 }
             }
             catch (Exception ex)
@@ -172,10 +196,13 @@ namespace Processamento_de_Imagens
             Util.SaveImage(image, Option.Text);
         }
 
+        // Evento que expande os sub-menus(caso haja) do Algoritmo selecionado
         private void Option_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             Scaling.Visibility = (Option.SelectedItem.ToString().Contains("Ampliação") || Option.SelectedItem.ToString().Contains("Redução")) ? Visibility.Visible : Visibility.Hidden;
             Thresholding.Visibility = Option.SelectedItem.ToString().Contains("Transformação de Intensidade (Limiarização)") ? Visibility.Visible : Visibility.Hidden;
+            MedianFilter.Visibility = Option.SelectedItem.ToString().Contains("Filtro de Média") ? Visibility.Visible : Visibility.Hidden;
+            LaplacianFilter.Visibility = Option.SelectedItem.ToString().Contains("Filtro Laplaciano") ? Visibility.Visible : Visibility.Hidden;
         }
     }
 }

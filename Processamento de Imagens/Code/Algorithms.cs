@@ -491,6 +491,7 @@ namespace Processamento_de_Imagens.Code
         #region Filtros
 
         // Filtro de Média
+        // Aplica-se pixels pretos nos contornos como alternativa para tratar a borda
         public static Bitmap MedianFilter(this Bitmap sourceBitmap, int matrixSize, int bias = 0, bool grayscale = false)
         {
             var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
@@ -565,10 +566,10 @@ namespace Processamento_de_Imagens.Code
         }
 
         // Filtro Gradiente (Máscara de Sobel 3X3)
-        public static Bitmap GradientFilter(Bitmap originalImage)
+        public static Bitmap GradientSobelFilter(Bitmap originalImage, int intensity = 1)
         {
             // Aplica o filtro usando a função de convolulação passando a matriz de sobel
-            var resultImage = ConvolutionFilter(originalImage, Matrix.Sobel3X3Horizontal, Matrix.Sobel3X3Vertical, 1.0, 0, false);
+            var resultImage = ConvolutionFilter(originalImage, Matrix.Sobel3X3Horizontal, Matrix.Sobel3X3Vertical, intensity, 0, false);
 
             // Retorna a imagem final
             return resultImage;
@@ -602,7 +603,6 @@ namespace Processamento_de_Imagens.Code
             }
 
             var filterWidth = filterMatrix.GetLength(1);
-            var filterHeight = filterMatrix.GetLength(0);
 
             var filterOffset = (filterWidth - 1) / 2;
 
@@ -779,6 +779,7 @@ namespace Processamento_de_Imagens.Code
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
             resultBitmap.UnlockBits(resultData);
 
+            // Retorna a imagem final
             return resultBitmap;
         }
 
@@ -806,38 +807,12 @@ namespace Processamento_de_Imagens.Code
             return resultBitmap;
         }
 
+        // Filtro Laplaciano 3X3 e 5X5
         public static Bitmap Laplacian3X3OfGaussian3X3Filter(this Bitmap sourceBitmap)
         {
             var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Gaussian3X3, 1.0 / 16.0, 0, true);
 
             resultBitmap = ConvolutionFilter(resultBitmap, Matrix.Laplacian3X3, 1.0, 0, false);
-
-            return resultBitmap;
-        }
-
-        public static Bitmap Laplacian3X3OfGaussian5X5Filter1(this Bitmap sourceBitmap)
-        {
-            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Gaussian5X5, 1.0 / 159.0, 0, true);
-
-            resultBitmap = ConvolutionFilter(resultBitmap, Matrix.Laplacian3X3, 1.0, 0, false);
-
-            return resultBitmap;
-        }
-
-        public static Bitmap Laplacian5X5OfGaussian3X3Filter(this Bitmap sourceBitmap)
-        {
-            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Gaussian3X3, 1.0 / 16.0, 0, true);
-
-            resultBitmap = ConvolutionFilter(resultBitmap, Matrix.Laplacian5X5, 1.0, 0, false);
-
-            return resultBitmap;
-        }
-
-        public static Bitmap Laplacian5X5OfGaussian5X5Filter1(this Bitmap sourceBitmap)
-        {
-            var resultBitmap = ConvolutionFilter(sourceBitmap, Matrix.Gaussian5X5, 1.0 / 159.0, 0, true);
-
-            resultBitmap = ConvolutionFilter(resultBitmap, Matrix.Laplacian5X5, 1.0, 0, false);
 
             return resultBitmap;
         }

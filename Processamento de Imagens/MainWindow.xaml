@@ -12,10 +12,10 @@
             <ColumnDefinition Width="0.5*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="80*" />
-            <RowDefinition Height="Auto" MinHeight="38" />
+            <RowDefinition Height="119*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="30"/>
-            <RowDefinition Height="367*" />
+            <RowDefinition Height="547*" />
         </Grid.RowDefinitions>
         <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
@@ -29,9 +29,9 @@
                 e João Celino<LineBreak/>IDE: Visual Studio 2018<LineBreak/>Linguagem de Programação: C#
             </TextBlock>
         </Grid>
-        <StackPanel Grid.Column="0" HorizontalAlignment="Right" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,145,2" Orientation="Horizontal">
+        <StackPanel Grid.Column="0" HorizontalAlignment="Right" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,20,2" Orientation="Horizontal" Width="1152">
             <!--<Button x:Name="Upload" Content="Selecionar imagem" Margin="20,0,0,0" Click="Upload_Click" Background="#7F43BACD" />-->
-            <ComboBox x:Name="Option" HorizontalAlignment="Stretch" Width="150" Margin="20,0,0,0" VerticalAlignment="Stretch" SelectionChanged="Option_SelectionChanged">
+            <ComboBox x:Name="Option" Width="100" Margin="20,0,0,0" SelectionChanged="Option_SelectionChanged">
                 <ComboBoxItem Content="Ampliação"/>
                 <ComboBoxItem Content="Redução"/>
                 <ComboBoxItem Content="Equalização Histograma"/>
@@ -43,7 +43,7 @@
                 <ComboBoxItem Content="Rotulação"/>
                 <ComboBoxItem Content="Filtro de Média"/>
                 <ComboBoxItem Content="Filtro Laplaciano"/>
-                <ComboBoxItem Content="Filtro Gradiente"/>
+                <ComboBoxItem Content="Filtro Gradiente (Sobel)"/>
             </ComboBox>
             <StackPanel x:Name="Scaling" Visibility="Hidden" Orientation="Horizontal">
                 <Label Content="Valor de redimensionamento:" Margin="20,0,0,0"/>
@@ -54,7 +54,17 @@
             <StackPanel Visibility="Hidden" x:Name="Thresholding">
                 <CheckBox x:Name="InvertThreshold" IsChecked="False" Content="Inverter" />
             </StackPanel>
-            <StackPanel Visibility="Hidden" x:Name="Aritmetic">
+            <StackPanel Visibility="Hidden" x:Name="MedianFilter">
+                <Label Content="Matriz:" Margin="20,0,0,0"/>
+                <TextBox x:Name="MedianFilterMatrix" InputScope="Number" Width="100" Text="3"/>
+            </StackPanel>
+            <StackPanel Visibility="Hidden" x:Name="LaplacianFilter">
+                <ComboBox x:Name="LaplacianOption" HorizontalAlignment="Stretch" Margin="20,0,0,0" Width="100" VerticalAlignment="Stretch">
+                    <ComboBoxItem Content="3X3"/>
+                    <ComboBoxItem Content="5X5"/>
+                    <ComboBoxItem Content="Gaussiano"/>
+                    <ComboBoxItem Content="3X3 e 5X5"/>
+                </ComboBox>
             </StackPanel>
             <StackPanel Visibility="Hidden" x:Name="Geometric">
                 <RadioButton x:Name="Rotation" Content="Rotação" IsChecked="True" GroupName="Mode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,0,0,0" BorderBrush="#FF5C1EFF"/>
