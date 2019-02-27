@@ -44,6 +44,10 @@
                 <ComboBoxItem Content="Filtro de Média"/>
                 <ComboBoxItem Content="Filtro Laplaciano"/>
                 <ComboBoxItem Content="Filtro Gradiente (Sobel)"/>
+                <ComboBoxItem Content="Dilatação"/>
+                <ComboBoxItem Content="Erosão"/>
+                <ComboBoxItem Content="Abertura"/>
+                <ComboBoxItem Content="Fechamento"/>
             </ComboBox>
             <StackPanel x:Name="Scaling" Visibility="Hidden" Orientation="Horizontal">
                 <Label Content="Valor de redimensionamento:" Margin="20,0,0,0"/>

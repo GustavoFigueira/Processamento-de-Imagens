@@ -179,6 +179,22 @@ namespace Processamento_de_Imagens
                 {
                     image = Algorithms.GradientSobelFilter(image);
                 }
+                else if (Option.Text == "Dilatação")
+                {
+                    image = Algorithms.DilateAndErodeFilter(image, 9, Algorithms.MorphologyType.Dilation, false, false, true);
+                }
+                else if (Option.Text == "Erosão")
+                {
+                    image = Algorithms.DilateAndErodeFilter(image, 9, Algorithms.MorphologyType.Erosion, false, false, true);
+                }
+                else if (Option.Text == "Abertura")
+                {
+                    image = Algorithms.OpenMorphologyFilter(image, 9, false, false, true);
+                }
+                else if (Option.Text == "Fechamento")
+                {
+                    image = Algorithms.CloseMorphologyFilter(image, 9, false, false, true);
+                }
             }
             catch (Exception ex)
             {

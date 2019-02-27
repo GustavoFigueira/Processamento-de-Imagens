@@ -819,5 +819,138 @@ namespace Processamento_de_Imagens.Code
 
         #endregion
 
+        #region Morfologia Matematica
+
+        public enum MorphologyType
+        {
+            Dilation,
+            Erosion
+        }
+
+        // Dilatação e Erosão
+        public static Bitmap DilateAndErodeFilter(this Bitmap sourceBitmap, int matrixSize, MorphologyType morphType, bool applyBlue = true, bool applyGreen = true, bool applyRed = true)
+        {
+            var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+            var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+            var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+
+            sourceBitmap.UnlockBits(sourceData);
+
+            int filterOffset = (matrixSize - 1) / 2;
+            int calcOffset = 0;
+
+            int byteOffset = 0;
+
+            byte blue = 0;
+            byte green = 0;
+            byte red = 0;
+
+            byte morphResetValue = 0;
+
+            if (morphType == MorphologyType.Erosion)
+                morphResetValue = 255;
+
+            for (int offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++)
+            {
+                for (int offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++)
+                {
+                    byteOffset = offsetY * sourceData.Stride + offsetX * 4;
+
+                    blue = morphResetValue;
+                    green = morphResetValue;
+                    red = morphResetValue;
+
+                    if (morphType == MorphologyType.Dilation)
+                    {
+                        for (int filterY = -filterOffset;filterY <= filterOffset; filterY++)
+                        {
+                            for (int filterX = -filterOffset; filterX <= filterOffset; filterX++)
+                            {
+                                calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
+
+                                if (pixelBuffer[calcOffset] > blue)
+                                    blue = pixelBuffer[calcOffset];
+
+                                if (pixelBuffer[calcOffset + 1] > green)
+                                    green = pixelBuffer[calcOffset + 1];
+
+                                if (pixelBuffer[calcOffset + 2] > red)
+                                    red = pixelBuffer[calcOffset + 2];
+                            }
+                        }
+                    }
+                    else if (morphType == MorphologyType.Erosion)
+                    {
+                        for (int filterY = -filterOffset; filterY <= filterOffset; filterY++)
+                        {
+                            for (int filterX = -filterOffset; filterX <= filterOffset; filterX++)
+                            {
+                                calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
+
+                                if (pixelBuffer[calcOffset] < blue)
+                                    blue = pixelBuffer[calcOffset];
+
+                                if (pixelBuffer[calcOffset + 1] < green)
+                                    green = pixelBuffer[calcOffset + 1];
+
+                                if (pixelBuffer[calcOffset + 2] < red)
+                                    red = pixelBuffer[calcOffset + 2];
+                            }
+                        }
+                    }
+
+                    if (!applyBlue)
+                        blue = pixelBuffer[byteOffset];
+
+                    if (!applyGreen)
+                        green = pixelBuffer[byteOffset + 1];
+
+                    if (!applyRed)
+                        red = pixelBuffer[byteOffset + 2];
+
+                    resultBuffer[byteOffset] = blue;
+                    resultBuffer[byteOffset + 1] = green;
+                    resultBuffer[byteOffset + 2] = red;
+                    resultBuffer[byteOffset + 3] = 255;
+                }
+            }
+
+            var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+
+            var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
+
+            resultBitmap.UnlockBits(resultData);
+
+            return resultBitmap;
+        }
+
+        // Abertura
+        public static Bitmap OpenMorphologyFilter(this Bitmap sourceBitmap, int matrixSize, bool applyBlue = true, bool applyGreen = true, bool applyRed = true)
+        {
+            var resultBitmap = sourceBitmap.DilateAndErodeFilter(matrixSize, MorphologyType.Erosion, applyBlue, applyGreen, applyRed);
+
+            resultBitmap = resultBitmap.DilateAndErodeFilter(matrixSize, MorphologyType.Dilation,applyBlue, applyGreen, applyRed);
+
+            return resultBitmap;
+        }
+
+        // Fechamento
+        public static Bitmap CloseMorphologyFilter(this Bitmap sourceBitmap, int matrixSize, bool applyBlue = true, bool applyGreen = true, bool applyRed = true)
+        {
+            var resultBitmap = sourceBitmap.DilateAndErodeFilter(matrixSize, MorphologyType.Dilation, applyBlue, applyGreen, applyRed);
+
+            resultBitmap = resultBitmap.DilateAndErodeFilter(matrixSize, MorphologyType.Erosion, applyBlue, applyGreen, applyRed);
+
+            return resultBitmap;
+        }
+
+        #endregion
+
     }
 }
